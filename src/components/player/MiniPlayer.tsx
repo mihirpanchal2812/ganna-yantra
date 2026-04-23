@@ -1,5 +1,5 @@
 import { Pause, Play, SkipForward } from "lucide-react";
-import { usePlayer } from "./MiniPlayer.context";
+import { usePlayer } from "./PlayerContext";
 import { cn } from "@/lib/utils";
 
 export function MiniPlayer() {
