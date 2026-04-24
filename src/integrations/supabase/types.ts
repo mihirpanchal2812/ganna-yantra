@@ -14,7 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      songs: {
+        Row: {
+          artist: string
+          cover_url: string | null
+          created_at: string
+          duration: number | null
+          id: string
+          storage_path: string
+          title: string
+        }
+        Insert: {
+          artist?: string
+          cover_url?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          storage_path: string
+          title: string
+        }
+        Update: {
+          artist?: string
+          cover_url?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          storage_path?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
