@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { uploadSong } from "@/lib/songs";
-import { Upload as UploadIcon, Music, Loader2 } from "lucide-react";
+import { Upload as UploadIcon, Music, Loader2, Image as ImageIcon, X } from "lucide-react";
 
 export const Route = createFileRoute("/upload")({
   component: UploadPage,
@@ -14,7 +14,10 @@ function prettyTitle(filename: string) {
 function UploadPage() {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const coverInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [cover, setCover] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [busy, setBusy] = useState(false);
@@ -34,13 +37,28 @@ function UploadPage() {
     if (!title) setTitle(prettyTitle(f.name));
   };
 
+  const onPickCover = (f: File | null) => {
+    setError(null);
+    if (!f) {
+      setCover(null);
+      setCoverPreview(null);
+      return;
+    }
+    if (!f.type.startsWith("image/")) {
+      setError("Album cover must be an image.");
+      return;
+    }
+    setCover(f);
+    setCoverPreview(URL.createObjectURL(f));
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !title.trim()) return;
     setBusy(true);
     setError(null);
     try {
-      await uploadSong(file, { title: title.trim(), artist: artist.trim() });
+      await uploadSong(file, { title: title.trim(), artist: artist.trim(), cover });
       navigate({ to: "/library" });
     } catch (err) {
       console.error(err);
@@ -111,6 +129,49 @@ function UploadPage() {
             onChange={(e) => setArtist(e.target.value)}
             placeholder="Unknown Artist"
             className="w-full rounded-lg border border-border bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Album cover <span className="normal-case text-muted-foreground/70">(optional)</span>
+          </label>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => coverInputRef.current?.click()}
+              className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-border bg-card transition-colors hover:border-primary hover:bg-accent"
+            >
+              {coverPreview ? (
+                <img src={coverPreview} alt="cover" className="h-full w-full object-cover" />
+              ) : (
+                <ImageIcon className="h-6 w-6 text-muted-foreground" />
+              )}
+            </button>
+            <div className="min-w-0 flex-1 text-xs text-muted-foreground">
+              {cover ? (
+                <div className="flex items-center gap-2">
+                  <span className="truncate">{cover.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => onPickCover(null)}
+                    className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full hover:bg-accent"
+                    aria-label="Remove cover"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ) : (
+                "Tap to add an album photo"
+              )}
+            </div>
+          </div>
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => onPickCover(e.target.files?.[0] ?? null)}
           />
         </div>
 

@@ -35,7 +35,10 @@ export async function fetchSongs(): Promise<Song[]> {
   });
 }
 
-export async function uploadSong(file: File, meta: { title: string; artist: string }) {
+export async function uploadSong(
+  file: File,
+  meta: { title: string; artist: string; cover?: File | null },
+) {
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
   const path = `${crypto.randomUUID()}-${safeName}`;
 
@@ -44,10 +47,27 @@ export async function uploadSong(file: File, meta: { title: string; artist: stri
     .upload(path, file, { contentType: file.type || "audio/mpeg", upsert: false });
   if (upErr) throw upErr;
 
+  let coverUrl: string | null = null;
+  if (meta.cover) {
+    const safeCover = meta.cover.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const coverPath = `covers/${crypto.randomUUID()}-${safeCover}`;
+    const { error: covErr } = await supabase.storage
+      .from(BUCKET)
+      .upload(coverPath, meta.cover, {
+        contentType: meta.cover.type || "image/jpeg",
+        upsert: false,
+      });
+    if (!covErr) {
+      const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(coverPath);
+      coverUrl = pub.publicUrl;
+    }
+  }
+
   const { error: insErr } = await supabase.from("songs").insert({
     title: meta.title,
     artist: meta.artist || "Unknown Artist",
     storage_path: path,
+    cover_url: coverUrl,
   });
   if (insErr) {
     // best-effort cleanup

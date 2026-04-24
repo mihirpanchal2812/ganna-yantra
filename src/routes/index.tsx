@@ -10,7 +10,22 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const [songs, setSongs] = useState<Song[]>([]);
+  const [greeting, setGreeting] = useState("Hello");
   const { recentIds, play } = usePlayer();
+
+  useEffect(() => {
+    const computeGreeting = () => {
+      const h = new Date().getHours();
+      if (h < 5) return "Good night";
+      if (h < 12) return "Good morning";
+      if (h < 17) return "Good afternoon";
+      if (h < 22) return "Good evening";
+      return "Good night";
+    };
+    setGreeting(computeGreeting());
+    const t = setInterval(() => setGreeting(computeGreeting()), 60_000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -32,7 +47,7 @@ function Home() {
   return (
     <div className="space-y-8">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Good evening</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">{greeting}</h1>
         <Link
           to="/library"
           className="text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-primary"
