@@ -30,14 +30,18 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Tunes — Mobile Music Player" },
+      { title: "Ganna-Yantra — Mobile Music Player" },
       { name: "description", content: "A mobile-first personal music player." },
       { name: "author", content: "Tunes" },
-      { property: "og:title", content: "Tunes" },
-      { property: "og:description", content: "Mobile-first personal music player." },
+      { property: "og:title", content: "Ganna-Yantra — Mobile Music Player" },
+      { property: "og:description", content: "A mobile-first personal music player." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Ganna-Yantra — Mobile Music Player" },
+      { name: "twitter:description", content: "A mobile-first personal music player." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/29845736-b867-4560-9395-36698c5dc425" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/29845736-b867-4560-9395-36698c5dc425" },
     ],
     links: [
       {
