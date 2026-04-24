@@ -22,11 +22,14 @@ interface PlayerState {
   duration: number;
   recentIds: string[];
   expanded: boolean;
+  repeat: boolean;
   play: (song: Song, queue?: Song[]) => void;
   toggle: () => void;
   next: () => void;
   prev: () => void;
   seek: (seconds: number) => void;
+  skip: (seconds: number) => void;
+  toggleRepeat: () => void;
   setExpanded: (v: boolean) => void;
 }
 
@@ -53,6 +56,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [recentIds, setRecentIds] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(false);
+  const [repeat, setRepeat] = useState(false);
+  const repeatRef = useRef(false);
+  useEffect(() => {
+    repeatRef.current = repeat;
+  }, [repeat]);
 
   // Lazy-init audio on client only
   useEffect(() => {
@@ -65,11 +73,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const onTime = () => setProgress(audio.currentTime);
     const onMeta = () => setDuration(audio.duration || 0);
     const onEnd = () => {
+      if (repeatRef.current) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+        return;
+      }
       // auto-advance
-      setIndex((i) => {
-        const nxt = i + 1;
-        return nxt;
-      });
+      setIndex((i) => i + 1);
     };
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
@@ -150,6 +160,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setProgress(seconds);
   }, []);
 
+  const skip = useCallback((seconds: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const target = Math.max(0, Math.min((audio.duration || 0), audio.currentTime + seconds));
+    audio.currentTime = target;
+    setProgress(target);
+  }, []);
+
+  const toggleRepeat = useCallback(() => setRepeat((r) => !r), []);
+
   const value = useMemo<PlayerState>(
     () => ({
       current,
@@ -160,14 +180,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       duration,
       recentIds,
       expanded,
+      repeat,
       play,
       toggle,
       next,
       prev,
       seek,
+      skip,
+      toggleRepeat,
       setExpanded,
     }),
-    [current, queue, index, isPlaying, progress, duration, recentIds, expanded, play, toggle, next, prev, seek],
+    [current, queue, index, isPlaying, progress, duration, recentIds, expanded, repeat, play, toggle, next, prev, seek, skip, toggleRepeat],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

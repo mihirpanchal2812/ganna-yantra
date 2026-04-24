@@ -1,4 +1,4 @@
-import { ChevronDown, Pause, Play, SkipBack, SkipForward } from "lucide-react";
+import { ChevronDown, Pause, Play, Repeat, RotateCcw, RotateCw, SkipBack, SkipForward } from "lucide-react";
 import { usePlayer } from "./PlayerContext";
 import { formatTime } from "@/lib/songs";
 
@@ -12,6 +12,9 @@ export function FullPlayer() {
     progress,
     duration,
     seek,
+    skip,
+    repeat,
+    toggleRepeat,
     expanded,
     setExpanded,
   } = usePlayer();
@@ -78,6 +81,15 @@ export function FullPlayer() {
           </button>
           <button
             type="button"
+            onClick={() => skip(-15)}
+            className="relative flex h-12 w-12 items-center justify-center rounded-full text-foreground hover:text-primary"
+            aria-label="Back 15 seconds"
+          >
+            <RotateCcw className="h-6 w-6" />
+            <span className="absolute text-[9px] font-bold">15</span>
+          </button>
+          <button
+            type="button"
             onClick={toggle}
             className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
             aria-label={isPlaying ? "Pause" : "Play"}
@@ -86,11 +98,33 @@ export function FullPlayer() {
           </button>
           <button
             type="button"
+            onClick={() => skip(15)}
+            className="relative flex h-12 w-12 items-center justify-center rounded-full text-foreground hover:text-primary"
+            aria-label="Forward 15 seconds"
+          >
+            <RotateCw className="h-6 w-6" />
+            <span className="absolute text-[9px] font-bold">15</span>
+          </button>
+          <button
+            type="button"
             onClick={next}
             className="flex h-12 w-12 items-center justify-center rounded-full text-foreground hover:text-primary"
             aria-label="Next"
           >
             <SkipForward className="h-7 w-7 fill-current" />
+          </button>
+        </div>
+        <div className="mt-4 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={toggleRepeat}
+            className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
+              repeat ? "text-primary" : "text-muted-foreground hover:text-foreground"
+            }`}
+            aria-label={repeat ? "Disable repeat" : "Enable repeat"}
+            aria-pressed={repeat}
+          >
+            <Repeat className="h-5 w-5" />
           </button>
         </div>
       </div>
