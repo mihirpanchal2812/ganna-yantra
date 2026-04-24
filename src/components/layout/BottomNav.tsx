@@ -1,11 +1,12 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, Library } from "lucide-react";
+import { Home, Library, Upload } from "lucide-react";
 
 export function BottomNav() {
   const { pathname } = useLocation();
   const items = [
     { to: "/", label: "Home", icon: Home },
     { to: "/library", label: "Library", icon: Library },
+    { to: "/upload", label: "Upload", icon: Upload },
   ] as const;
 
   return (
