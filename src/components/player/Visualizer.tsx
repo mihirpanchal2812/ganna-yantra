@@ -74,9 +74,7 @@ export function Visualizer({ className }: { className?: string }) {
         // rounded-rect
         const rx = Math.min(radius, barW / 2, totalH / 2);
         ctx.beginPath();
-        // @ts-expect-error roundRect supported in modern browsers
         if (ctx.roundRect) {
-          // @ts-expect-error see above
           ctx.roundRect(x, y, barW, totalH, rx);
         } else {
           ctx.rect(x, y, barW, totalH);
