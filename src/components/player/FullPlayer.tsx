@@ -1,20 +1,6 @@
-import { useState } from "react";
-import {
-  ChevronDown,
-  ListMusic,
-  Pause,
-  Play,
-  Repeat,
-  RotateCcw,
-  RotateCw,
-  SkipBack,
-  SkipForward,
-} from "lucide-react";
+import { ChevronDown, Pause, Play, Repeat, RotateCcw, RotateCw, SkipBack, SkipForward } from "lucide-react";
 import { usePlayer } from "./PlayerContext";
 import { formatTime } from "@/lib/songs";
-import { Visualizer } from "./Visualizer";
-import { QueuePanel } from "./QueuePanel";
-import { SleepTimerMenu } from "./SleepTimerMenu";
 
 export function FullPlayer() {
   const {
@@ -32,7 +18,6 @@ export function FullPlayer() {
     expanded,
     setExpanded,
   } = usePlayer();
-  const [showQueue, setShowQueue] = useState(false);
 
   if (!current) return null;
 
@@ -53,17 +38,7 @@ export function FullPlayer() {
           <ChevronDown className="h-6 w-6" />
         </button>
         <div className="text-xs uppercase tracking-wider text-muted-foreground">Now Playing</div>
-        <div className="flex items-center gap-1">
-          <SleepTimerMenu />
-          <button
-            type="button"
-            onClick={() => setShowQueue(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-white/10"
-            aria-label="Open queue"
-          >
-            <ListMusic className="h-5 w-5" />
-          </button>
-        </div>
+        <div className="w-10" />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center px-8">
@@ -75,11 +50,10 @@ export function FullPlayer() {
             <img src={current.cover} alt="" className="h-full w-full object-cover" />
           )}
         </div>
-        <div className="mt-6 w-full max-w-sm text-center">
+        <div className="mt-8 w-full max-w-sm text-center">
           <h2 className="truncate text-2xl font-bold text-foreground">{current.title}</h2>
           <p className="mt-1 truncate text-base text-muted-foreground">{current.artist}</p>
         </div>
-        <Visualizer className="mt-4 h-16 w-full max-w-sm" />
       </div>
 
       <div className="px-8 pb-10">
@@ -96,7 +70,7 @@ export function FullPlayer() {
           <span>{formatTime(progress)}</span>
           <span>{formatTime(duration)}</span>
         </div>
-        <div className="mt-6 flex items-center justify-center gap-6">
+        <div className="mt-6 flex items-center justify-center gap-8">
           <button
             type="button"
             onClick={prev}
@@ -154,8 +128,6 @@ export function FullPlayer() {
           </button>
         </div>
       </div>
-
-      {showQueue && <QueuePanel onClose={() => setShowQueue(false)} />}
     </div>
   );
 }
