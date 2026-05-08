@@ -164,14 +164,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       ["pause", () => audioRef.current?.pause()],
       ["previoustrack", () => prevRef.current()],
       ["nexttrack", () => nextRef.current()],
-      ["seekbackward", (d: any) => {
-        const a = audioRef.current; if (!a) return;
-        a.currentTime = Math.max(0, a.currentTime - (d?.seekOffset ?? 10));
-      }],
-      ["seekforward", (d: any) => {
-        const a = audioRef.current; if (!a) return;
-        a.currentTime = Math.min(a.duration || 0, a.currentTime + (d?.seekOffset ?? 10));
-      }],
       ["seekto", (d: any) => {
         const a = audioRef.current; if (!a || d?.seekTime == null) return;
         a.currentTime = d.seekTime;
