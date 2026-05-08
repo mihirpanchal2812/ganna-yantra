@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ChevronLeft, Trash2, Pencil, Check, X } from "lucide-react";
+import { ChevronLeft, Trash2, Pencil, Check, X, Play } from "lucide-react";
+import { usePlayer } from "@/components/player/PlayerContext";
 import {
   fetchPlaylistSongs,
   fetchPlaylists,
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/playlists/$playlistId")({
 function PlaylistDetail() {
   const { playlistId } = Route.useParams();
   const navigate = useNavigate();
+  const { play } = usePlayer();
   const [songs, setSongs] = useState<Song[]>([]);
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [editing, setEditing] = useState(false);
@@ -86,6 +88,12 @@ function PlaylistDetail() {
               <p className="text-sm text-muted-foreground">{songs.length} songs</p>
             </div>
             <div className="flex gap-1">
+              <button
+                onClick={() => songs.length && play(songs[0], songs)}
+                disabled={songs.length === 0}
+                className="flex items-center gap-1 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+                aria-label="Play playlist"
+              ><Play className="h-4 w-4 fill-current" /> Play</button>
               <button
                 onClick={() => setEditing(true)}
                 className="rounded-full p-2 text-muted-foreground hover:bg-accent"
