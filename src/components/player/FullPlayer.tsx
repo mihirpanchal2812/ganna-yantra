@@ -1,6 +1,9 @@
-import { ChevronDown, Pause, Play, Repeat, RotateCcw, RotateCw, SkipBack, SkipForward } from "lucide-react";
+import { ChevronDown, ListMusic, Moon, Pause, Play, Repeat, SkipBack, SkipForward } from "lucide-react";
+import { useState } from "react";
 import { usePlayer } from "./PlayerContext";
 import { formatTime } from "@/lib/songs";
+import { QueueSheet } from "./QueueSheet";
+import { SleepTimerSheet } from "./SleepTimerSheet";
 
 export function FullPlayer() {
   const {
@@ -12,12 +15,14 @@ export function FullPlayer() {
     progress,
     duration,
     seek,
-    skip,
     repeat,
     toggleRepeat,
     expanded,
     setExpanded,
+    sleepRemaining,
   } = usePlayer();
+  const [queueOpen, setQueueOpen] = useState(false);
+  const [sleepOpen, setSleepOpen] = useState(false);
 
   if (!current) return null;
 
@@ -81,29 +86,11 @@ export function FullPlayer() {
           </button>
           <button
             type="button"
-            onClick={() => skip(-15)}
-            className="relative flex h-12 w-12 items-center justify-center rounded-full text-foreground hover:text-primary"
-            aria-label="Back 15 seconds"
-          >
-            <RotateCcw className="h-6 w-6" />
-            <span className="absolute text-[9px] font-bold">15</span>
-          </button>
-          <button
-            type="button"
             onClick={toggle}
             className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? <Pause className="h-7 w-7 fill-current" /> : <Play className="ml-1 h-7 w-7 fill-current" />}
-          </button>
-          <button
-            type="button"
-            onClick={() => skip(15)}
-            className="relative flex h-12 w-12 items-center justify-center rounded-full text-foreground hover:text-primary"
-            aria-label="Forward 15 seconds"
-          >
-            <RotateCw className="h-6 w-6" />
-            <span className="absolute text-[9px] font-bold">15</span>
           </button>
           <button
             type="button"
@@ -114,7 +101,7 @@ export function FullPlayer() {
             <SkipForward className="h-7 w-7 fill-current" />
           </button>
         </div>
-        <div className="mt-4 flex items-center justify-center">
+        <div className="mt-4 flex items-center justify-center gap-6">
           <button
             type="button"
             onClick={toggleRepeat}
@@ -126,8 +113,33 @@ export function FullPlayer() {
           >
             <Repeat className="h-5 w-5" />
           </button>
+          <button
+            type="button"
+            onClick={() => setQueueOpen(true)}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
+            aria-label="Queue"
+          >
+            <ListMusic className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSleepOpen(true)}
+            className={`relative flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
+              sleepRemaining ? "text-primary" : "text-muted-foreground hover:text-foreground"
+            }`}
+            aria-label="Sleep timer"
+          >
+            <Moon className="h-5 w-5" />
+            {sleepRemaining != null && (
+              <span className="absolute -bottom-4 text-[10px] font-semibold tabular-nums">
+                {formatTime(sleepRemaining)}
+              </span>
+            )}
+          </button>
         </div>
       </div>
+      <QueueSheet open={queueOpen} onClose={() => setQueueOpen(false)} />
+      <SleepTimerSheet open={sleepOpen} onClose={() => setSleepOpen(false)} />
     </div>
   );
 }

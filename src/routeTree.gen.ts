@@ -10,12 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
+import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaylistsPlaylistIdRouteImport } from './routes/playlists.$playlistId'
 
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaylistsRoute = PlaylistsRouteImport.update({
+  id: '/playlists',
+  path: '/playlists',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryRoute = LibraryRouteImport.update({
@@ -28,34 +35,57 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaylistsPlaylistIdRoute = PlaylistsPlaylistIdRouteImport.update({
+  id: '/$playlistId',
+  path: '/$playlistId',
+  getParentRoute: () => PlaylistsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/library': typeof LibraryRoute
+  '/playlists': typeof PlaylistsRouteWithChildren
   '/upload': typeof UploadRoute
+  '/playlists/$playlistId': typeof PlaylistsPlaylistIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/library': typeof LibraryRoute
+  '/playlists': typeof PlaylistsRouteWithChildren
   '/upload': typeof UploadRoute
+  '/playlists/$playlistId': typeof PlaylistsPlaylistIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/library': typeof LibraryRoute
+  '/playlists': typeof PlaylistsRouteWithChildren
   '/upload': typeof UploadRoute
+  '/playlists/$playlistId': typeof PlaylistsPlaylistIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/library' | '/upload'
+  fullPaths:
+    | '/'
+    | '/library'
+    | '/playlists'
+    | '/upload'
+    | '/playlists/$playlistId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/library' | '/upload'
-  id: '__root__' | '/' | '/library' | '/upload'
+  to: '/' | '/library' | '/playlists' | '/upload' | '/playlists/$playlistId'
+  id:
+    | '__root__'
+    | '/'
+    | '/library'
+    | '/playlists'
+    | '/upload'
+    | '/playlists/$playlistId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LibraryRoute: typeof LibraryRoute
+  PlaylistsRoute: typeof PlaylistsRouteWithChildren
   UploadRoute: typeof UploadRoute
 }
 
@@ -66,6 +96,13 @@ declare module '@tanstack/react-router' {
       path: '/upload'
       fullPath: '/upload'
       preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playlists': {
+      id: '/playlists'
+      path: '/playlists'
+      fullPath: '/playlists'
+      preLoaderRoute: typeof PlaylistsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library': {
@@ -82,23 +119,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playlists/$playlistId': {
+      id: '/playlists/$playlistId'
+      path: '/$playlistId'
+      fullPath: '/playlists/$playlistId'
+      preLoaderRoute: typeof PlaylistsPlaylistIdRouteImport
+      parentRoute: typeof PlaylistsRoute
+    }
   }
 }
+
+interface PlaylistsRouteChildren {
+  PlaylistsPlaylistIdRoute: typeof PlaylistsPlaylistIdRoute
+}
+
+const PlaylistsRouteChildren: PlaylistsRouteChildren = {
+  PlaylistsPlaylistIdRoute: PlaylistsPlaylistIdRoute,
+}
+
+const PlaylistsRouteWithChildren = PlaylistsRoute._addFileChildren(
+  PlaylistsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LibraryRoute: LibraryRoute,
+  PlaylistsRoute: PlaylistsRouteWithChildren,
   UploadRoute: UploadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
