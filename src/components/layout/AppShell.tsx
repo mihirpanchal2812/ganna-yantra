@@ -3,6 +3,7 @@ import { PlayerProvider, usePlayer } from "@/components/player/PlayerContext";
 import { MiniPlayer } from "@/components/player/MiniPlayer";
 import { FullPlayer } from "@/components/player/FullPlayer";
 import { BottomNav } from "./BottomNav";
+import { LoginGate } from "@/components/auth/LoginGate";
 
 function ShellInner({ children }: { children: ReactNode }) {
   const { current } = usePlayer();
@@ -20,8 +21,10 @@ function ShellInner({ children }: { children: ReactNode }) {
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <PlayerProvider>
-      <ShellInner>{children}</ShellInner>
-    </PlayerProvider>
+    <LoginGate>
+      <PlayerProvider>
+        <ShellInner>{children}</ShellInner>
+      </PlayerProvider>
+    </LoginGate>
   );
 }
