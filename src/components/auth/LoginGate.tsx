@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const KEY = "tunes:auth";
-const USER = "mihi2811";
+const USER = "mihir2811";
 const PASS = "pasword4826";
 
 export function LoginGate({ children }: { children: ReactNode }) {
