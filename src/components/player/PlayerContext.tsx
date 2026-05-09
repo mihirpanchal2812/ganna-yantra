@@ -172,6 +172,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     handlers.forEach(([action, h]) => {
       try { ms.setActionHandler(action, h as any); } catch { /* noop */ }
     });
+    // Explicitly disable default 10/15s skip buttons so the lock screen shows next/prev.
+    try { ms.setActionHandler("seekbackward", null); } catch { /* noop */ }
+    try { ms.setActionHandler("seekforward", null); } catch { /* noop */ }
     return () => {
       handlers.forEach(([action]) => {
         try { ms.setActionHandler(action, null); } catch { /* noop */ }
